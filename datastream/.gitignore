@@ -1,0 +1,10 @@
+target/
+.DS_Store
+*.classpath
+*.settings
+*.tern*
+.idea
+*.iml
+.security/
+*.jar
+node_modules

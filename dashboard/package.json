@@ -1,0 +1,15 @@
+{
+  "author": "Red Hat",
+  "name": "iot-dashboard",
+  "repository": "jamesfalkner/iot-dashboard",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "description": "EuroTech IoT Dashboard Demo",
+  "homepage": "https://github.com/jamesfalkner",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=0.10.10"
+  }
+}

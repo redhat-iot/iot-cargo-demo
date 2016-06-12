@@ -1,0 +1,16 @@
+<div id="shipmentmap">
+
+            <ng-map zoom="12" center="San Francisco, CA" pan-control="false" zoom-control="false" scale-control="false" street-view-control="false">
+                <directions
+                        draggable="true"
+                        travel-mode="DRIVING"
+                        origin="{{shipFrom}}"
+                        destination="{{shipTo}}">
+                </directions>
+
+                <marker id="cp" position="San Francisco, CA" animation="Animation.DROP" centered="true"></marker>
+
+
+            </ng-map>
+
+    </div>
