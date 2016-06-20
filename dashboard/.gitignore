@@ -8,3 +8,4 @@ target/
 .security/
 *.jar
 src/main/webapp/vendor
+app.properties

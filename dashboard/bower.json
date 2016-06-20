@@ -13,7 +13,8 @@
     "angular-websocket": "2.0.0",
     "rickshaw": "1.5.1",
     "ngmap": "1.17.3",
-    "angular-moment": "0.10.3"
+    "angular-moment": "0.10.3",
+    "angular-bootstrap-switch": "0.5.1"
   },
   "resolutions": {
     "angular": "1.5.6",

@@ -18,10 +18,10 @@ angular.module('app').directive('humChart', function (Alerts) {
                 height: 80,
                 min: 0,
                 max: 1,
-                series: new Rickshaw.Series.FixedDuration([{name: 'one'}], undefined, {
+                series: new Rickshaw.Series.FixedDuration([{name: 'Humidity', color: 'green'}], undefined, {
                     timeInterval: 20,
                     maxDataPoints: 10,
-                    timeBase: new Date().getTime() / 1000
+                    timeBase: new Date().getTime()
                 })
             });
 
@@ -29,27 +29,42 @@ angular.module('app').directive('humChart', function (Alerts) {
                 graph: graph
             }));
 
-            graph.setRenderer("xkcd", {stops: {
-                min: 0,
-                max: 1,
-                stops: [
-                    {offset: "0%", color: "green"},
-                    {offset: "80%", color: "green"},
-                    {offset: "80%", color: "yellow"},
-                    {offset: "90%", color: "yellow"},
-                    {offset: "90%", color: "red"},
-                    {offset: "100%", color: "red"}
-                ]}
+            graph.setRenderer("xkcd", {
+                stops: {
+                    min: 0,
+                    max: 1,
+                    stops: [
+                        {offset: "0%", color: "green"},
+                        {offset: "80%", color: "green"},
+                        {offset: "80%", color: "yellow"},
+                        {offset: "90%", color: "yellow"},
+                        {offset: "90%", color: "red"},
+                        {offset: "100%", color: "red"}
+                    ]
+                }
             });
 
             var xAxis = new Rickshaw.Graph.Axis.X({
                 graph: graph,
                 tickFormat: function (x) {
-                    return new Date(x * 1000).toLocaleTimeString();
+                    return new Date(x).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric'
+                    });
                 },
                 ticks: 3
             });
             xAxis.render();
+
+            var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                graph: graph,
+                formatter: function(series, x, y) {
+                    var date = '<span class="date">' + new Date(x).toLocaleString() + '</span>';
+                    var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+                    var content = swatch + series.name + ": " + parseFloat(y).toFixed(2) + '%<br>' + date;
+                    return content;
+                }
+            } );
 
             var y_axis = new Rickshaw.Graph.Axis.Y({
                 graph: graph,
@@ -62,35 +77,60 @@ angular.module('app').directive('humChart', function (Alerts) {
             graph.render();
 
             function listener(newData) {
-                if (newData.humidity >= 0.9) {
-                    Alerts.addAlert(newData.pkgId, 'danger', 'Danger!', "Humidity exceeded 90%");
-                } else if (newData.humidity >= 0.8) {
-                    Alerts.addAlert(newData.pkgId, 'warning', 'Warning!', "Humidity exceeded 80%");
-                }
+                scope.$apply(function () {
 
-                if (newData.pkgId != scope.currentShipment.pkgId) {
-                    return;
-                }
-                scope.currentHumidity = newData.humidity * 100;
+                    newData.humidity /= 100.0;
+                    if (newData.humidity >= 0.9) {
+                        
+                        Alerts.addAlert(newData.pkgId, scope.getDesc(newData.pkgId), 'danger', 'Danger!', "Humidity exceeded 90%");
+                    } else if (newData.humidity >= 0.8) {
+                        Alerts.addAlert(newData.pkgId, scope.getDesc(newData.pkgId), 'warning', 'Warning!', "Humidity exceeded 80%");
+                    }
 
-                graph.series.addData({
-                    one: newData.humidity
-                }, newData.timestamp);
-                graph.update();
+                    if (newData.pkgId != scope.currentShipment.pkgId) {
+                        return;
+                    }
+                    scope.currentHumidity = newData.humidity * 100;
+
+                    graph.series.addData({
+                        Humidity: newData.humidity
+                    }, newData.timestamp);
+                    graph.update();
+                });
             }
 
-            scope.addListener(listener);
-
             scope.$on('selectedShipment', function (event, arg) {
+                // if (scope.currentShipment.pkgId) {
+                //     scope.unsubscribe(scope.currentShipment.pkgId);
+                // }
+
+                scope.currentShipment  = arg;
                 graph.series.setTimeBase(new Date().getTime() / 1000);
-                for (var x = 0; x < 10; x++)
+                while (graph.series[0].data.length > 0) {
                     graph.series.dropData();
-                graph.render();
+                }
+
+                // populate graph with recent data
                 scope.currentHumidity = 0;
+
+                var startOfGraph = new Date().getTime() - (2 * 10 * 1000);
+                scope.getRecentData(arg.pkgId, 'humidity', startOfGraph, function(res) {
+                    res.forEach(function (humObj) {
+                        graph.series.addData({
+                            Humidity: parseFloat(humObj.humidity / 100.0),
+                        }, parseInt(humObj.timestamp));
+                        scope.currentHumidity = humObj.humidity / 100.0;
+                    });
+                    graph.render();
+                });
+
+                scope.subscribe(arg.pkgId, listener, arg.randomData);
             });
 
             element.on('$destroy', function () {
-                scope.removeListener(listener);
+                if (scope.currentShipment.pkgId) {
+                    scope.unsubscribe(scope.currentShipment.pkgId);
+                }
             });
         }
     }

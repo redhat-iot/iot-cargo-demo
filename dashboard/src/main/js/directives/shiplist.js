@@ -9,5 +9,9 @@ angular.module('app').directive('shipList', function () {
 		replace: true,
 		templateUrl: 'partials/shiplist.html',
 		controller: 'ShipListController',
+		link: function postLink(scope, element, attrs) {
+			element.find('[data-toggle="tooltip"]').tooltip()
+
+		}
 	}
 });

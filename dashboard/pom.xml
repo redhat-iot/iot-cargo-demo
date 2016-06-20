@@ -48,6 +48,10 @@
             </resource>
         </resources>
 
+        <filters>
+            <filter>app.properties</filter>
+        </filters>
+
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>

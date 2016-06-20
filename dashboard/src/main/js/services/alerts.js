@@ -8,16 +8,16 @@ angular.module('app')
 
 	this.clearAlerts = function() {
 		alerts = [];
-		console.log("clearing alerts");
 		$rootScope.$broadcast('alert', null);
 	};
 
-	this.addAlert = function(id, type, header, message, links) {
+	this.addAlert = function(id, desc, type, header, message, links) {
 		var newAlert = {
 			pkgId: id ? id : "",
+			desc: desc,
 			type: type,
 			timestamp: Date.now(),
-			header: id ? id : "",
+			header: name ? name : (id ? id : ""),
 			message: header + ": " + message,
 			icon: this.getIconName(type),
 			links: links

@@ -18,7 +18,12 @@
                 </div>
                 <div class="panel-body">
                     <ship-list></ship-list>
+                    <button class="btn btn-primary btn-lg clickable" data-toggle="modal"
+                            data-target="#addShipmentModal" type="button">Add Shipment</button>
+                    </button>
                 </div>
+
+
             </div>
 
 
@@ -44,8 +49,8 @@
                     <temp-chart></temp-chart>
                     <h3 style="text-align: center">Humidity</h3>
                     <hum-chart></hum-chart>
-                    <h3 style="text-align: center">Displacement</h3>
-                    <disp-chart></disp-chart>
+                    <h3 style="text-align: center">Lux</h3>
+                    <light-chart></light-chart>
                 </div>
             </div>
 
@@ -54,3 +59,65 @@
     </div>
 
 </div>
+
+<div class="modal fade" modal-show modal-visible="showDialog" id="addShipmentModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Shipment</h4>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="pkgIdSelect">ID</label>
+                        <div class="col-sm-10">
+                            <select style="max-width: 70%" id="pkgIdSelect" ng-model="newShipment.pkgId" ng-options="item for item in allShipmentPkgIds" ng-model="selected"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="pkgIdAlt">Name</label>
+                        <div class="col-sm-10">
+                            <input ng-model="newShipment.name" type="text" id="pkgIdAlt" class="form-control"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="origination">Origination</label>
+                        <div class="col-sm-10">
+                            <input ng-model="newShipment.origination" type="text" id="origination" class="form-control"></div>
+                    </div>
+
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label" for="destination">Destination</label>
+                        <div class="col-sm-10">
+                            <input ng-model="newShipment.destination" type="text" id="destination" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        <label class="col-sm-2 control-label" for="randomData">Random Metrics</label>
+                        <div class="col-sm-10">
+                            <input bs-switch ng-model="newShipment.randomData" id="randomData" type="checkbox" checked>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button data-dismiss="modal" ng-click="addShipment(newShipment)" type="button" class="btn btn-primary">Add Shipment</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+
+
+
+</div>
+
+

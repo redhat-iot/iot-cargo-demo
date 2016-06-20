@@ -15,21 +15,30 @@
                 <th>Destination</th>
                 <th>ETA</th>
                 <th>Alerts</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
 
-            <tr ng-class="{ active: isSelected(shipment)}" ng-click="selectShipment(shipment);" ng-repeat="shipment in shipments | filter:query">
-                <td>{{shipment.pkgId}}</td>
+            <tr ng-class="{ active: isSelected(shipment)}" ng-click="selectShipment(shipment);" ng-repeat="shipment in shipments | filter:query track by $index">
+                <td data-toggle="tooltip" data-placement="right" title="{{shipment.pkgId}}">{{shipment.name ? shipment.name: shipment.pkgId}}</td>
                 <td><a target="_blank" href="http://maps.google.com/?q={{shipment.fromAddress}}">{{shipment.fromAddress}}</a></td>
                 <td><a target="_blank" href="http://maps.google.com/?q={{shipment.toAddress}}">{{shipment.toAddress}}</a></td>
                 <td>{{shipment.eta | amCalendar:referenceTime:formats}}</td>
                 <td data-toggle="modal"
                     data-target="#alertsModal">
                     <div style="margin: 5px;text-align: center">
-                        <span ng-repeat="type in ['danger', 'warning', 'success', 'info']" class="label label-pill label-{{type}}">&nbsp;{{getAlertCount(shipment.pkgId, type)}}&nbsp;</span>
+                        <span ng-repeat="type in ['danger', 'warning', 'success', 'info']" class="label label-pill label-{{getAlertCount(shipment.pkgId, type) > 0 ? type : 'default'}}">&nbsp;{{getAlertCount(shipment.pkgId, type) > 0 ? getAlertCount(shipment.pkgId, type) : '•' }}&nbsp;</span>
 
                     </div>
+                </td>
+                <td>
+                    <span style="color: {{ isAlerted(shipment) ? 'red' : 'slategray'}}"
+                          title="Alert Driver" ng-click="isAlerted(shipment) && clearAlert(shipment)"
+                          class="{{ isAlerted(shipment) ? 'clickable' : ''}} fa fa-2x fa-exclamation-triangle"></span>
+
+                    <span style="color: slategray" title="Mark Delivered" ng-click="removeShipment($event, shipment);" class="fa fa-2x fa-check"></span>
+
                 </td>
             </tr>
             </tbody>

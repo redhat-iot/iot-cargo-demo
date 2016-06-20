@@ -1,15 +1,25 @@
 'use strict';
 
-var module = angular.module('app', [ 'ngRoute', 'patternfly', 'angular-websocket', 'ngMap', 'angularMoment' ]);
+var module = angular.module('app', ['ngRoute', 'ui.bootstrap', 'patternfly', 'angular-websocket', 'ngMap', 'angularMoment', 'frapontillo.bootstrap-switch']);
 
+angular.module('app')
+
+// TODO: Use JBoss SSO to properly protect app
+.constant('APP_CONFIG', {
+    EDC_USERNAME: '${EDC_USERNAME}',
+    EDC_PASSWORD: '${EDC_PASSWORD}' ,
+    EDC_REST_ENDPOINT: '${EDC_REST_ENDPOINT}',
+    JDG_REST_ENDPOINT: '${JDG_REST_ENDPOINT}',
+    GOOGLE_MAPS_API_KEY: '${GOOGLE_MAPS_API_KEY}'
+});
 
 Rickshaw.namespace('Rickshaw.Graph.Renderer.Xkcd');
 
-Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
+Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create(Rickshaw.Graph.Renderer, {
     name: 'xkcd',
 
-    defaults: function($super) {
-        return Rickshaw.extend( $super(), {
+    defaults: function ($super) {
+        return Rickshaw.extend($super(), {
             unstack: true,
             fill: false,
             stroke: true,
@@ -18,10 +28,10 @@ Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
                 min: 0,
                 max: 100
             }
-        } );
+        });
     },
 
-    render: function() {
+    render: function () {
         var graph = this.graph;
         var strokeWidth = 3;
 
@@ -32,8 +42,12 @@ Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
             .enter();
 
         var line = d3.svg.line()
-            .x( function(d) { return graph.x(d.x) } )
-            .y( function(d) { return graph.y(d.y) } )
+            .x(function (d) {
+                return graph.x(d.x)
+            })
+            .y(function (d) {
+                return graph.y(d.y)
+            })
             .interpolate(this.graph.interpolation).tension(this.tension);
 
         var nodes = element.append("svg:path")
@@ -59,12 +73,12 @@ Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create( Rickshaw.Graph.Renderer, {
 
 
         var i = 0;
-        graph.series.forEach( function(series) {
+        graph.series.forEach(function (series) {
             if (series.disabled) return;
             series.path = nodes[0][i++];
             this._styleSeries(series);
-        }, this );
-    },
+        }, this);
+    }
 });
 
 

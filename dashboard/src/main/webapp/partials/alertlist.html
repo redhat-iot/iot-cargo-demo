@@ -3,7 +3,7 @@
     <div ng-repeat="alert in alerts | reverse | limitTo : 3 track by $index">
         <div class="alert alert-{{alert.type}}">
             <span class="pficon {{alert.icon}}"></span>
-            <strong>{{alert.timestamp | amTimeAgo | capitalize}} {{alert.header}}</strong> {{alert.message}}</a>.
+            <strong>{{alert.timestamp | amTimeAgo | capitalize}}: {{alert.header}}</strong> {{alert.message}}</a>.
             <span ng-repeat="link in alert.links track by $index">
                 <a href="{{link.url}}">[{{link.text}}]</a>&nbsp;
             </span>
@@ -31,7 +31,7 @@
                     <div ng-repeat="alert in alerts | reverse track by $index">
                         <div class="alert alert-{{alert.type}}">
                             <span class="pficon {{alert.icon}}"></span>
-                            <strong>{{alert.timestamp | amTimeAgo | capitalize}} {{alert.header}}</strong>
+                            <strong>{{alert.timestamp | amTimeAgo | capitalize}}: {{alert.header}}</strong>
                             {{alert.message}}</a>.
                             <span ng-repeat="link in alert.links track by $index">
                                 <a href="{{link.url}}">[{{link.text}}]</a>&nbsp;
