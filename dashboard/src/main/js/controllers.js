@@ -77,7 +77,7 @@ angular.module('app')
                     SensorData.getRecentData(pkgId, metric, startTime, cb);
                 };
 
-                $scope.getDesc = function(pkgId) {
+                $scope.getDesc = function (pkgId) {
                     return ConfigData.getDesc(pkgId);
                 };
 
@@ -102,7 +102,7 @@ angular.module('app')
                     SensorData.getRecentData(pkgId, metric, startTime, cb);
                 };
 
-                $scope.getDesc = function(pkgId) {
+                $scope.getDesc = function (pkgId) {
                     return ConfigData.getDesc(pkgId);
                 };
 
@@ -122,7 +122,7 @@ angular.module('app')
                     SensorData.unsubscribe(topic);
                 };
 
-                $scope.getDesc = function(pkgId) {
+                $scope.getDesc = function (pkgId) {
                     return ConfigData.getDesc(pkgId);
                 };
                 $scope.getRecentData = function (pkgId, metric, startTime, cb) {
@@ -179,64 +179,76 @@ angular.module('app')
                     SensorData.removeListener(l);
                 };
 
-                $scope.shipFrom = "";
-                $scope.shipTo = "";
                 $scope.mapsUrl = 'https://maps.googleapis.com/maps/api/js?key=' + APP_CONFIG.GOOGLE_MAPS_API_KEY;
 
                 var timers = [];
 
                 $scope.$on('selectedShipment', function (event, arg) {
                     timers.forEach(function (timer) {
-                        clearTimeout(timer);
+                        $timeout.cancel(timer);
                     });
                     timers = [];
+                    
+                    var directionsDisplay = new google.maps.DirectionsRenderer();
+                    var directionsService = new google.maps.DirectionsService();
 
-                    $scope.shipFrom = arg.fromAddress;
-                    $timeout(function () {
-                        $scope.shipTo = arg.toAddress;
-                    }, 100);
+                    var request = {
+                        origin: arg.fromAddress,
+                        destination: arg.toAddress,
+                        travelMode: google.maps.DirectionsTravelMode.DRIVING
+                    };
+                    directionsService.route(request, function (response, status) {
+                        if (status === google.maps.DirectionsStatus.OK) {
+                            directionsDisplay.setDirections(response);
+                            NgMap.getMap().then(function (map) {
+                                directionsDisplay.setMap(map);
 
-                    var st = setTimeout(function () {
-                        NgMap.getMap().then(function (map) {
-                            map.markers.cp.setMap(null);
-                            var steps = map.directionsRenderers[0].directions.routes[0].legs[0].steps;
-                            var totalsteps = steps.length;
-                            var curStepIdx = Math.floor(totalsteps * 0.2);
-                            var curStep = steps[curStepIdx];
+                                var st = $timeout(function () {
+                                    console.dir(directionsDisplay);
+                                    map.markers.cp.setMap(null);
+                                    var steps = directionsDisplay.directions.routes[0].legs[0].steps;
+                                    var totalsteps = steps.length;
+                                    var curStepIdx = Math.floor(totalsteps * 0.2);
+                                    var curStep = steps[curStepIdx];
 
-                            map.markers.cp.setMap(map);
-                            map.markers.cp.setPosition(curStep.start_location);
+                                    map.markers.cp.setMap(map);
+                                    map.markers.cp.setPosition(curStep.start_location);
 
-                            function movecontainer(marker, dlat, dlng, index, total, delay) {
-                                var t = setTimeout(function () {
-                                    movemarker(marker, dlat, dlng, index, total);
-                                }, delay);
-                                timers.push(t);
-                            }
+                                    function movecontainer(marker, dlat, dlng, index, total, delay) {
+                                        var t = $timeout(function () {
+                                            movemarker(marker, dlat, dlng, index, total);
+                                        }, delay);
+                                        timers.push(t);
+                                    }
 
-                            function movemarker(marker, dlat, dlng, index, total) {
-                                var newpos = new google.maps.LatLng(marker.getPosition().lat() + dlat,
-                                    marker.getPosition().lng() + dlng);
-                                marker.setPosition(newpos);
-                                map.setCenter(newpos);
-                                if (index < total) {
-                                    var t2 = setTimeout(function () {
-                                        movemarker(marker, dlat, dlng, index + 1, total);
-                                    }, 1000);
-                                    timers.push(t2);
-                                }
-                            }
+                                    function movemarker(marker, dlat, dlng, index, total) {
+                                        var newpos = new google.maps.LatLng(marker.getPosition().lat() + dlat,
+                                            marker.getPosition().lng() + dlng);
+                                        marker.setPosition(newpos);
+                                        map.setCenter(newpos);
+                                        if (index < total) {
+                                            var t2 = $timeout(function () {
+                                                movemarker(marker, dlat, dlng, index + 1, total);
+                                            }, 1000);
+                                            timers.push(t2);
+                                        }
+                                    }
 
-                            for (var i = curStepIdx, idx = 0; i < totalsteps; i++, idx++) {
-                                var startloc = steps[i].start_location;
-                                var endloc = steps[i].end_location;
-                                var dlat = (endloc.lat() - startloc.lat()) / 50;
-                                var dlng = (endloc.lng() - startloc.lng()) / 50;
-                                movecontainer(map.markers.cp, dlat, dlng, 0, 50, 1000 * 50 * idx);
-                            }
-                        });
-                    }, 1000);
-                    timers.push(st);
+                                    for (var i = curStepIdx, idx = 0; i < totalsteps; i++, idx++) {
+                                        var startloc = steps[i].start_location;
+                                        var endloc = steps[i].end_location;
+                                        var dlat = (endloc.lat() - startloc.lat()) / 50;
+                                        var dlng = (endloc.lng() - startloc.lng()) / 50;
+                                        movecontainer(map.markers.cp, dlat, dlng, 0, 50, 1000 * 50 * idx);
+                                    }
+                                }, 1000);
+                                timers.push(st);
+
+                            });
+                        } else {
+                            Notifications.error('Unable to display directions');
+                        }
+                    });
                 });
 
 
@@ -251,11 +263,11 @@ angular.module('app')
                     ConfigData.removeListener(l);
                 };
 
-                $scope.getAlertCount = function(pkgId, type) {
+                $scope.getAlertCount = function (pkgId, type) {
                     if ($scope.shipalerts == null) {
                         return 0;
                     }
-                    var count = $scope.shipalerts.filter(function(alert) {
+                    var count = $scope.shipalerts.filter(function (alert) {
                         if (alert == null) return false;
                         return ((alert.pkgId == pkgId) && (alert.type == type));
                     }).length;
@@ -267,11 +279,11 @@ angular.module('app')
                 $scope.selectedShipment = null;
                 $scope.shipalerts = [];
 
-                $scope.isAlerted = function(shipment) {
+                $scope.isAlerted = function (shipment) {
                     return (shipment.indicator == 'red');
                 };
 
-                $scope.clearAlert = function(shipment) {
+                $scope.clearAlert = function (shipment) {
                     if (confirm("Click OK to confirm and cancel this Alert.")) {
                         var topic = shipment.pkgId.replace('assets', 'notification');
                         var payload = {
@@ -291,10 +303,10 @@ angular.module('app')
                             }
                         };
 
-                        SensorData.publish(topic, payload, function() {
+                        SensorData.publish(topic, payload, function () {
                             $scope.selectedShipment.indicator = undefined;
                             ConfigData.saveShipments();
-                        }, function(err) {
+                        }, function (err) {
                             Notifications.error(err.statusText + ": " + err.data.message);
                         });
                     }
