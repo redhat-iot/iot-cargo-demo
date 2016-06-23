@@ -507,7 +507,7 @@ angular.module('app')
                 $scope.shipalerts = [];
 
                 $scope.isAlerted = function (shipment) {
-                    return (shipment.indicator == 'red');
+                    return shipment.indicator;
                 };
 
                 $scope.clearAlert = function (shipment) {
@@ -553,9 +553,12 @@ angular.module('app')
                         $scope.selectedShipment.indicator = 'red';
                         ConfigData.saveShipments();
                     } else if (data.green) {
-                        Alerts.addAlert("indicator", "indicator", "ok", "Indicator", "GREEN Sensor Indicator");
+                        Alerts.addAlert("indicator", "indicator", "success", "Indicator", "GREEN Sensor Indicator");
                         $scope.selectedShipment.indicator = 'green';
                         ConfigData.saveShipments();
+                    } else {
+                        $scope.selectedShipment.indicator = undefined;
+                        ConfigData.saveShipments();                        
                     }
                 }
 
