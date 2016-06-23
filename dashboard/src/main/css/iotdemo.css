@@ -4,6 +4,14 @@
     margin: 10px;
 }
 
+#historylink {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 25%;
+    text-align: center;
+}
+
 #chart {
     position: relative;
     left: 10%;

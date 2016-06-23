@@ -1,4 +1,8 @@
 <div id="chart_container">
+    <div id="historylink">
+        <i ng-show="!isTempDownloading" class="fa fa-2x fa-history" ng-click="showTempHistory()" ></i>
+        <div ng-show="isTempDownloading" class="spinner spinner-sm spinner-inline"></div>
+    </div>
     <div id="y_axis"></div>
     <div id="chart"></div>
     <div id="datalabeldiv"><span id="datalabel">{{currentTemp | number:1 }}°C</span></div>

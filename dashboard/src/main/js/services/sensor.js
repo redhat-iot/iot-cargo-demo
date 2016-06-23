@@ -145,12 +145,14 @@ angular.module('app')
             sockets = [];
         };
 
-        factory.getRecentData = function (pkgId, metric, startTime, cb) {
+        factory.getRecentData = function (pkgId, metric, startTime, endTime, limit, cb) {
             $http({
                 method: 'GET',
                 url: APP_CONFIG.EDC_REST_ENDPOINT + '/messages/searchByTopic?' +
                 'topic=' + pkgId +
-                '&startDate=' +startTime,
+                '&startDate=' +startTime +
+                '&endDate=' +endTime +
+                '&limit=' + limit,
                 headers: {
                     'Authorization': auth
                 }

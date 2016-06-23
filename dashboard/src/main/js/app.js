@@ -1,6 +1,6 @@
 'use strict';
 
-var module = angular.module('app', ['ngRoute', 'ui.bootstrap', 'patternfly', 'angular-websocket', 'ngMap', 'angularMoment', 'frapontillo.bootstrap-switch']);
+var module = angular.module('app', ['ngRoute', 'ui.bootstrap', 'patternfly', 'angular-websocket', 'ngMap', 'angular-rickshaw', 'angularMoment', 'frapontillo.bootstrap-switch']);
 
 angular.module('app')
 

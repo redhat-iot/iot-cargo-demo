@@ -1,6 +1,12 @@
 <div id="chart_container">
+    <div id="historylink">
+        <i ng-show="!isLightDownloading" class="fa fa-2x fa-history" ng-click="showLightHistory()" ></i>
+        <div ng-show="isLightDownloading" class="spinner spinner-sm spinner-inline"></div>
+    </div>
+
     <div id="y_axis"></div>
     <div id="chart"></div>
     <div id="datalabeldiv"><span id="datalabel">{{currentLight | number:1 }}lm</span></div>
+
 </div>
 

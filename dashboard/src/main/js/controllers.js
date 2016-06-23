@@ -74,19 +74,125 @@ angular.module('app')
                 };
 
                 $scope.getRecentData = function (pkgId, metric, startTime, cb) {
-                    SensorData.getRecentData(pkgId, metric, startTime, cb);
+                    SensorData.getRecentData(pkgId, metric, startTime, new Date().getTime(), 50, cb);
                 };
 
                 $scope.getDesc = function (pkgId) {
                     return ConfigData.getDesc(pkgId);
                 };
+                $scope.isTempDownloading = false;
+
+                $scope.showTempHistory = function () {
+
+                    if (!$scope.currentShipment.pkgId) {
+                        alert("You must choose a shipment!");
+                        return;
+                    }
+                    $scope.isTempDownloading = true;
+
+                    var pointCount = 50;
+                    var now = new Date().getTime();
+                    var msInDay = (24 * 60 * 60 * 1000);
+                    var timeInc = Math.floor(msInDay / pointCount);
+                    var startTime = now - msInDay;
+
+                    function getPoint(pkgId, metric, startTime, endTime, cb) {
+                        SensorData.getRecentData(pkgId, metric, startTime, endTime, 1, cb);
+                    }
+
+                    var fns = [];
+                    for (var i = startTime; i < now; i += timeInc) {
+                        (function (foo) {
+                            fns.push(function (async_callback) {
+                                getPoint($scope.currentShipment.pkgId, 'ambient', foo, foo + timeInc, function (data) {
+                                    async_callback(null, data);
+                                });
+                            });
+                        })(i);
+                    }
+
+                    async.parallel(fns, function (err, results) {
+                        $scope.isTempDownloading = false;
+
+                        var data = [];
+
+                        results.forEach(function (singleResultArr) {
+                            singleResultArr.forEach(function (res) {
+                                data.push({
+                                    x: parseInt(res.timestamp),
+                                    y: parseFloat(res.ambient)
+                                });
+                            });
+                        });
+
+                        var modalInstance = $modal.open({
+                            templateUrl: 'partials/history.html',
+                            controller: 'HistoryController',
+                            size: 'lg',
+                            resolve: {
+                                items: function () {
+                                    return data;
+                                },
+                                suffix: function() { return '°C'},
+                                color: function() { return 'steelblue'},
+                                metric: function() { return 'Temperature'},
+                                renderer: function() { return 'line'}
+
+                            }
+                        });
+                    });
+                };
 
                 $scope.currentShipment = {};
             }])
 
+    .controller("HistoryController",
+        ['$scope', '$http', 'Notifications', 'SensorData', 'ConfigData', 'metric', 'color', 'suffix', 'items', 'renderer',
+            function ($scope, $http, Notifications, SensorData, ConfigData, metric, color, suffix, items, renderer) {
+                $scope.history_options = {
+                    renderer: renderer,
+                    width: 800
+                };
+                $scope.history_series = [{
+                    name: metric,
+                    color: color,
+                    data: items
+                }];
+
+
+                $scope.history_features = {
+                    hover: {
+                        formatter: function(series, x, y) {
+                            var date = '<span class="date">' + new Date(x).toLocaleString() + '</span>';
+                            var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+                            var content = swatch + series.name + ": " + parseFloat(y).toFixed(2) + suffix + '<br>' + date;
+                            return content;
+                        }
+
+                    },
+                    xAxis: {
+                        tickFormat: function (x) {
+                            return new Date(x).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric'
+                            });
+                        },
+                        ticks: 3
+
+                    },
+                    yAxis: {
+                        tickFormat: 'formatKMBT'
+                    }
+
+
+                };
+
+
+            }])
+
     .controller("HumController",
-        ['$scope', '$http', 'Notifications', 'SensorData', 'ConfigData',
-            function ($scope, $http, Notifications, SensorData, ConfigData) {
+        ['$scope', '$modal', '$http', 'Notifications', 'SensorData', 'ConfigData',
+            function ($scope, $modal, $http, Notifications, SensorData, ConfigData) {
 
                 $scope.currentHumidity = 0;
 
@@ -99,18 +205,79 @@ angular.module('app')
                 };
 
                 $scope.getRecentData = function (pkgId, metric, startTime, cb) {
-                    SensorData.getRecentData(pkgId, metric, startTime, cb);
+                    SensorData.getRecentData(pkgId, metric, startTime, new Date().getTime(), 50, cb);
                 };
 
                 $scope.getDesc = function (pkgId) {
                     return ConfigData.getDesc(pkgId);
                 };
 
+                $scope.isHumDownloading = false;
+
+                $scope.showHumHistory = function () {
+                    if (!$scope.currentShipment.pkgId) {
+                        alert("You must choose a shipment!");
+                        return;
+                    }
+                    $scope.isHumDownloading = true;
+
+                    var pointCount = 50;
+                    var now = new Date().getTime();
+                    var msInDay = (24 * 60 * 60 * 1000);
+                    var timeInc = Math.floor(msInDay / pointCount);
+                    var startTime = now - msInDay;
+
+                    function getPoint(pkgId, metric, startTime, endTime, cb) {
+                        SensorData.getRecentData(pkgId, metric, startTime, endTime, 1, cb);
+                    }
+
+                    var fns = [];
+                    for (var i = startTime; i < now; i += timeInc) {
+                        (function (foo) {
+                            fns.push(function (async_callback) {
+                                getPoint($scope.currentShipment.pkgId, 'humidity', foo, foo + timeInc, function (data) {
+                                    async_callback(null, data);
+                                });
+                            });
+                        })(i);
+                    }
+
+                    async.parallel(fns, function (err, results) {
+                        $scope.isHumDownloading = false;
+
+                        var data = [];
+
+                        results.forEach(function (singleResultArr) {
+                            singleResultArr.forEach(function (res) {
+                                data.push({
+                                    x: parseInt(res.timestamp),
+                                    y: parseFloat(res.humidity)
+                                });
+                            });
+                        });
+
+                        var modalInstance = $modal.open({
+                            templateUrl: 'partials/history.html',
+                            controller: 'HistoryController',
+                            size: 'lg',
+                            resolve: {
+                                items: function () {
+                                    return data;
+                                },
+                                suffix: function() { return '%'},
+                                color: function() { return 'blue'},
+                                metric: function() { return 'Humidity'},
+                                renderer: function() { return 'bar'}
+                            }
+                        });
+                    });
+                };
+
                 $scope.currentShipment = {};
             }])
     .controller("LightController",
-        ['$scope', '$http', 'Notifications', 'SensorData', 'ConfigData',
-            function ($scope, $http, Notifications, SensorData, ConfigData) {
+        ['$scope', '$modal', '$http', 'Notifications', 'SensorData', 'ConfigData',
+            function ($scope, $modal, $http, Notifications, SensorData, ConfigData) {
 
                 $scope.currentLight = 0;
 
@@ -126,7 +293,68 @@ angular.module('app')
                     return ConfigData.getDesc(pkgId);
                 };
                 $scope.getRecentData = function (pkgId, metric, startTime, cb) {
-                    SensorData.getRecentData(pkgId, metric, startTime, cb);
+                    SensorData.getRecentData(pkgId, metric, startTime, new Date().getTime(), 50, cb);
+                };
+
+                $scope.isLightDownloading = false;
+
+                $scope.showLightHistory = function () {
+                    if (!$scope.currentShipment.pkgId) {
+                        alert("You must choose a shipment!");
+                        return;
+                    }
+                    $scope.isLightDownloading = true;
+
+                    var pointCount = 50;
+                    var now = new Date().getTime();
+                    var msInDay = (24 * 60 * 60 * 1000);
+                    var timeInc = Math.floor(msInDay / pointCount);
+                    var startTime = now - msInDay;
+
+                    function getPoint(pkgId, metric, startTime, endTime, cb) {
+                        SensorData.getRecentData(pkgId, metric, startTime, endTime, 1, cb);
+                    }
+
+                    var fns = [];
+                    for (var i = startTime; i < now; i += timeInc) {
+                        (function (foo) {
+                            fns.push(function (async_callback) {
+                                getPoint($scope.currentShipment.pkgId, 'light', foo, foo + timeInc, function (data) {
+                                    async_callback(null, data);
+                                });
+                            });
+                        })(i);
+                    }
+
+                    async.parallel(fns, function (err, results) {
+                        $scope.isLightDownloading = false;
+
+                        var data = [];
+
+                        results.forEach(function (singleResultArr) {
+                            singleResultArr.forEach(function (res) {
+                                data.push({
+                                    x: parseInt(res.timestamp),
+                                    y: parseFloat(res.light)
+                                });
+                            });
+                        });
+
+                        var modalInstance = $modal.open({
+                            templateUrl: 'partials/history.html',
+                            controller: 'HistoryController',
+                            size: 'lg',
+                            resolve: {
+                                items: function () {
+                                    return data;
+                                },
+                                suffix: function() { return 'lux'},
+                                color: function() { return 'green'},
+                                metric: function() { return 'Light'},
+                                renderer: function() { return 'bar'}
+                            }
+                        });
+                    });
                 };
 
                 $scope.currentShipment = {};
@@ -188,7 +416,7 @@ angular.module('app')
                         $timeout.cancel(timer);
                     });
                     timers = [];
-                    
+
                     var directionsDisplay = new google.maps.DirectionsRenderer();
                     var directionsService = new google.maps.DirectionsService();
 
@@ -204,7 +432,6 @@ angular.module('app')
                                 directionsDisplay.setMap(map);
 
                                 var st = $timeout(function () {
-                                    console.dir(directionsDisplay);
                                     map.markers.cp.setMap(null);
                                     var steps = directionsDisplay.directions.routes[0].legs[0].steps;
                                     var totalsteps = steps.length;
