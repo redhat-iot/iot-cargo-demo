@@ -136,7 +136,7 @@ angular.module('app')
                                 suffix: function() { return '°C'},
                                 color: function() { return 'steelblue'},
                                 metric: function() { return 'Temperature'},
-                                renderer: function() { return 'line'}
+                                renderer: function() { return 'area'}
 
                             }
                         });
@@ -151,7 +151,9 @@ angular.module('app')
             function ($scope, $http, Notifications, SensorData, ConfigData, metric, color, suffix, items, renderer) {
                 $scope.history_options = {
                     renderer: renderer,
-                    width: 800
+                    width: 800,
+                    height: 300,
+                    min: -10
                 };
                 $scope.history_series = [{
                     name: metric,
@@ -265,9 +267,9 @@ angular.module('app')
                                     return data;
                                 },
                                 suffix: function() { return '%'},
-                                color: function() { return 'blue'},
+                                color: function() { return '#EE7600'},
                                 metric: function() { return 'Humidity'},
-                                renderer: function() { return 'bar'}
+                                renderer: function() { return 'area'}
                             }
                         });
                     });
@@ -349,7 +351,7 @@ angular.module('app')
                                     return data;
                                 },
                                 suffix: function() { return 'lux'},
-                                color: function() { return 'green'},
+                                color: function() { return '#FFE303'},
                                 metric: function() { return 'Light'},
                                 renderer: function() { return 'bar'}
                             }
