@@ -353,7 +353,7 @@ angular.module('app')
                                 suffix: function() { return 'lux'},
                                 color: function() { return '#FFE303'},
                                 metric: function() { return 'Light'},
-                                renderer: function() { return 'bar'}
+                                renderer: function() { return 'area'}
                             }
                         });
                     });
@@ -508,12 +508,19 @@ angular.module('app')
                 $scope.selectedShipment = null;
                 $scope.shipalerts = [];
 
-                $scope.isAlerted = function (shipment) {
-                    return shipment.indicator;
+                $scope.isAlerted = function (pkgId) {
+
+                    for (var i = 0; i < $scope.shipments.length; i++) {
+                        var ship = $scope.shipments[i];
+                        if (ship.pkgId == pkgId && ship.indicator) {
+                            return ship.indicator;
+                        }
+                    }
+                    return false;
                 };
 
                 $scope.clearAlert = function (shipment) {
-                    if (confirm("Click OK to confirm and cancel this Alert.")) {
+                    if (confirm("Click OK to clear this Alert.")) {
                         var topic = shipment.pkgId.replace('assets', 'notification');
                         var payload = {
                             metrics: {
@@ -550,25 +557,42 @@ angular.module('app')
 
                 function listener(data) {
 
-                    if (data.red) {
-                        Alerts.addAlert("indicator", "indicator", "danger", "Indicator", "RED Sensor Indicator");
-                        $scope.selectedShipment.indicator = 'red';
-                        ConfigData.saveShipments();
-                    } else if (data.green) {
-                        Alerts.addAlert("indicator", "indicator", "success", "Indicator", "GREEN Sensor Indicator");
-                        $scope.selectedShipment.indicator = 'green';
-                        ConfigData.saveShipments();
+                    var shipment = null;
+                    var origId = data.pkgId.replace('notification', 'assets');
+                    if (origId == $scope.selectedShipment.pkgId) {
+                        shipment = $scope.selectedShipment;
                     } else {
-                        $scope.selectedShipment.indicator = undefined;
-                        ConfigData.saveShipments();                        
+
+                        $scope.shipments.forEach(function(shipObj) {
+                            if (shipObj.pkgId == origId) {
+                                shipment = shipObj;
+                            }
+                        });
                     }
+
+                    if (shipment == null) {
+                        // we know of no shipment that matches the id from the data message
+                        return;
+                    }
+                    if (data.red) {
+                        Alerts.addAlert(shipment.pkgId, shipment.name, "danger", "Indicator", "RED Sensor Indicator");
+                        shipment.indicator = 'red';
+                    } else if (data.green) {
+                        Alerts.addAlert(shipment.pkgId, shipment.name, "success", "Indicator", "GREEN Sensor Indicator");
+                        shipment.indicator = 'green';
+                    } else {
+                        shipment.indicator = undefined;
+                    }
+                    ConfigData.saveShipments();
+
+                    $scope.$apply();
                 }
 
                 $scope.selectShipment = function (shipment) {
                     if ($scope.selectedShipment && (shipment.pkgId == $scope.selectedShipment.pkgId)) {
                         return;
                     }
-                    SensorData.unsubscribeAll();
+               //   SensorData.unsubscribeAll();
                     $scope.selectedShipment = shipment;
                     $rootScope.$broadcast('selectedShipment', shipment);
                     SensorData.subscribe(shipment.pkgId.replace('assets', 'notification'), listener, shipment.randomData);
@@ -586,7 +610,7 @@ angular.module('app')
 
                 // TODO: alerts should come from server eventually...
                 $scope.$on('alert', function (event, alert) {
-                    $scope.shipalerts.push(alert);
+                    $scope.shipalerts = Alerts.getAlerts();
                 });
 
                 ConfigData.addListener(function () {

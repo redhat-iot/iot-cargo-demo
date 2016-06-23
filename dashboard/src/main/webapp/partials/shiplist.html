@@ -33,9 +33,9 @@
                     </div>
                 </td>
                 <td>
-                    <span style="color: {{ isAlerted(shipment) }}"
-                          title="Alert Driver" ng-click="isAlerted(shipment) && clearAlert(shipment)"
-                          class="{{ isAlerted(shipment) ? 'clickable' : ''}} fa fa-2x fa-exclamation-triangle"></span>
+                    <span style="color: {{ isAlerted(shipment.pkgId) }}"
+                          title="Alert Driver" ng-click="isAlerted(shipment.pkgId) && clearAlert(shipment)"
+                          class="{{ isAlerted(shipment.pkgId) ? 'clickable' : ''}} fa fa-2x fa-exclamation-triangle"></span>
 
                     <span style="color: slategray" title="Mark Delivered" ng-click="removeShipment($event, shipment);" class="fa fa-2x fa-check"></span>
 
