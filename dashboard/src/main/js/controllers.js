@@ -588,11 +588,13 @@ angular.module('app')
                 };
 
                 $scope.removeShipment = function (e, shipment) {
-                    ConfigData.removeShipment(shipment, function () {
-                        Notifications.success("Removed shipment " + shipment.name);
-                    }, function (err) {
-                        Notifications.error("Error removing shipment: " + err);
-                    });
+                    if (confirm("Click OK to mark delivered and remove from shipping list")) {
+                        ConfigData.removeShipment(shipment, function () {
+                            Notifications.success("Removed shipment " + shipment.name);
+                        }, function (err) {
+                            Notifications.error("Error removing shipment: " + err);
+                        });
+                    }
                     e.stopPropagation();
                 };
 
