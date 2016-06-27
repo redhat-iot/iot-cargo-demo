@@ -44,18 +44,6 @@ angular.module('app')
                         Notifications.error("Error adding shipment: " + err);
                     });
                 };
-
-                $scope.removeShipment = function (e, shipment) {
-                    ConfigData.removeShipment(shipment, function () {
-                        Notifications.success("Removed shipment " + shipment.name);
-                    }, function (err) {
-                        Notifications.error("Error removing shipment: " + err);
-                    });
-                    e.stopPropagation();
-
-                };
-
-
             }])
 
     .controller("TempController",
@@ -555,7 +543,7 @@ angular.module('app')
                     return $scope.selectedShipment.pkgId == shipment.pkgId;
                 };
 
-                function listener(data) {
+                function notificationListener(data) {
 
                     var shipment = null;
                     var origId = data.pkgId.replace('notification', 'assets');
@@ -583,9 +571,9 @@ angular.module('app')
                     } else {
                         shipment.indicator = undefined;
                     }
-                    ConfigData.saveShipments();
-
-                    $scope.$apply();
+                    if (!shipment.randomData) {
+                        ConfigData.saveShipments();
+                    }
                 }
 
                 $scope.selectShipment = function (shipment) {
@@ -595,7 +583,7 @@ angular.module('app')
                //   SensorData.unsubscribeAll();
                     $scope.selectedShipment = shipment;
                     $rootScope.$broadcast('selectedShipment', shipment);
-                    SensorData.subscribe(shipment.pkgId.replace('assets', 'notification'), listener, shipment.randomData);
+                    SensorData.subscribe(shipment.pkgId.replace('assets', 'notification'), notificationListener, shipment.randomData);
 
                 };
 

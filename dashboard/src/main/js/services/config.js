@@ -47,15 +47,15 @@ angular.module('app')
                 return (shipment.pkgId != shipObj.pkgId);
             });
 
-            persistShipments(tmpShipments, function () {
+            persistShipments(tmpShipments, function (newShipments) {
 
-                currentShipments = tmpShipments;
+                currentShipments = newShipments;
                 listeners.forEach(function (listener) {
                     listener(null);
                 });
                 onSuccess(currentShipments);
-            }, function (err) {
-                onFail(err.statusText);
+            }, function (errMsg) {
+                onFail(errMsg);
             });
         };
 
@@ -63,21 +63,25 @@ angular.module('app')
             // set config
             var tmpShipments = currentShipments.concat(shipment);
 
-            persistShipments(tmpShipments, function () {
+            persistShipments(tmpShipments, function (newShipments) {
 
-                currentShipments = tmpShipments;
+                currentShipments = newShipments;
                 listeners.forEach(function (listener) {
                     listener(null);
                 });
                 onSuccess(currentShipments);
 
-            }, function (err) {
-                onFail(err.statusText);
+            }, function (errMsg) {
+                onFail(errMsg);
             });
         };
 
         factory.saveShipments = function() {
-            persistShipments(currentShipments, function() {}, function() {});
+            persistShipments(currentShipments, function(newShipments) {
+
+            }, function(errMsg) {
+
+            });
 
         };
 
@@ -104,20 +108,8 @@ angular.module('app')
 
             allShipmentPkgIds = [];
             currentShipments = [];
-
-
-            // get config
-            $http({
-                method: 'GET',
-                url: APP_CONFIG.JDG_REST_ENDPOINT + '/rhiot/sensorConfig'
-            }).then(function (response) {
-                currentShipments = response.data;
-                listeners.forEach(function (listener) {
-                    listener(null);
-                });
-
-            }, function (response) {
-                Notifications.error("Error fetching Sensor Configuration: " + response.statusText + ", using fake data which will not be saved");
+            
+            function offlineMode() {
                 offlineMode = true;
                 currentShipments = [
                     {
@@ -129,6 +121,30 @@ angular.module('app')
                         randomData: true
                     }
                 ];
+            }
+
+            // get config
+            $http({
+                method: 'GET',
+                url: APP_CONFIG.JDG_REST_ENDPOINT + '/rhiot/sensorConfig'
+            }).then(function (response) {
+                currentShipments = response.data;
+                if ((currentShipments == undefined) || (currentShipments.constructor !== Array)) {
+                    Notifications.error("Error fetching Sensor Configuration (invalid data). Reload to retry");
+                    offlineMode();
+                    listeners.forEach(function (listener) {
+                        listener(null);
+                    });
+                    return;
+                }
+
+                currentShipments = currentShipments.filter(function(shipment) {
+                    return shipment.pkgId;
+                });
+
+            }, function sensorConfigError(response) {
+                Notifications.error("Error fetching Sensor Configuration: " + response.statusText + ". Reload to retry");
+                offlineMode();
                 listeners.forEach(function (listener) {
                     listener(null);
                 });
