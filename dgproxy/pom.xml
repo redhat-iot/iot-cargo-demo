@@ -17,13 +17,12 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.jboss.quickstarts.eap</groupId>
-    <artifactId>jboss-helloworld-rs</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <groupId>org.redhat.iot</groupId>
+    <artifactId>dgproxy</artifactId>
+    <version>1.0</version>
     <packaging>war</packaging>
-    <name>JBoss EAP Quickstart: helloworld-rs</name>
-    <description>JBoss EAP Quickstart: Helloworld using JAX-RS</description>
-    <url>http://www.jboss.org/products/eap</url>
+    <name>Simple DG Proxy</name>
+    <description>Simple DG Proxy using hotrod</description>
 
     <licenses>
         <license>
