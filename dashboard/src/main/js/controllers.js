@@ -574,6 +574,8 @@ angular.module('app')
                     if (!shipment.randomData) {
                         ConfigData.saveShipments();
                     }
+
+                    $scope.$apply();
                 }
 
                 $scope.selectShipment = function (shipment) {
