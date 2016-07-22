@@ -16,7 +16,7 @@ angular.module('app').directive('lightChart', function (Alerts) {
                 // width: 500,
                 height: 80,
                 min: 0,
-                max: 1000,
+                max: 5000,
                 series: new Rickshaw.Series.FixedDuration([{name: 'Light', color: '#E9B200'}], undefined, {
                     timeInterval: 2,
                     maxDataPoints: 10,
@@ -31,11 +31,11 @@ angular.module('app').directive('lightChart', function (Alerts) {
             graph.setRenderer("xkcd", {
                 stops: {
                     min: 0,
-                    max: 1000,
+                    max: 5000,
                     stops: [
                         {offset: "0%", color: "green"},
-                        {offset: "80%", color: "green"},
-                        {offset: "80%", color: "red"},
+                        {offset: "50%", color: "green"},
+                        {offset: "50%", color: "red"},
                         {offset: "100%", color: "red"}
                     ]
                 }
@@ -76,9 +76,9 @@ angular.module('app').directive('lightChart', function (Alerts) {
 
                 scope.$apply(function () {
 
-                    if (Math.abs(newData.light) >= 100) {
+                    if (Math.abs(newData.light) >= 4000) {
                         Alerts.addAlert(newData.pkgId, scope.getDesc(newData.pkgId), 'danger', 'Danger!', "Too Bright!");
-                    } else if (Math.abs(newData.light) >= 90) {
+                    } else if (Math.abs(newData.light) >= 1000) {
                         Alerts.addAlert(newData.pkgId, scope.getDesc(newData.pkgId), 'warning', 'Warning!', "Brightness approaching allowed maximum");
                     }
 
