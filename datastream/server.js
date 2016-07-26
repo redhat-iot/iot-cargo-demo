@@ -1,5 +1,5 @@
 var ipaddress = "0.0.0.0";
-var port      = 8081;
+var port      = 8080;
 
 var WebSocket = require('ws');
 var WebSocketServer = WebSocket.Server;
