@@ -22,7 +22,7 @@ EDC_PASSWORD=
 #
 # A JBoss Data Grid REST endpoint URL use for storing/retrieving sensor configuration
 #
-JDG_REST_ENDPOINT=
+JDG_REST_ENDPOINT=http://localhost:8180/dgproxy/rest
 
 #
 # Your Google Maps API Key
