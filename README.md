@@ -32,25 +32,25 @@ connect to the EuroTech Device Cloud and start streaming data from selected devi
 It also relies on a [JBoss Data Grid server](https://www.redhat.com/en/technologies/jboss-middleware/data-grid)
 to be available using its built-in REST interface.
 
-There are three steps to build and run the demo:
+Follow these steps to build and run the demo:
 
-1. [Download](https://access.redhat.com/products/red-hat-jboss-data-grid) and run JBoss Data Grid 7.0.0 or later:
+* [Download](https://access.redhat.com/products/red-hat-jboss-data-grid) and run JBoss Data Grid 7.0.0 or later:
 ```
     $ unzip jboss-datagrid-7.0.0-server.zip
     $ jboss-datagrid-7.0.0-server/bin/standalone.sh
 ```
-2. [Download](https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform/) and run JBoss EAP 7.0 or later and specify a port offset to avoid port conflicts with Data Grid:
+* [Download](https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform/) and run JBoss EAP 7.0 or later and specify a port offset to avoid port conflicts with Data Grid:
 ```
     $ unzip jboss-eap-7.0.0.zip
     $ jboss-eap-7.0.0/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -b 0.0.0.0 -bmanagement=0.0.0.0
 ```  
-3. Clone this repo to `<WORKSPACE>` directory, and build the Data Grid proxy, and deploy to EAP
+* Clone this repo to `<WORKSPACE>` directory, and build the Data Grid proxy, and deploy to EAP using these commands:
 ```
     $ cd <WORKSPACE>/dgproxy
     $ mvn clean package
     $ cp target/dgproxy.war <JBOSS_EAP_HOME>/standlone/deployments
 ```
-4. Supply your Eurotech and Google API credentials, then build and run the dashboard:
+* Supply your Eurotech and Google API credentials, then build and run the dashboard using these commands:
 ```
     $ cd <WORKSPACE>/dashboard
     $ cp app.properties.template app.properties
