@@ -10,7 +10,8 @@ angular.module('app')
     EDC_PASSWORD: '${EDC_PASSWORD}' ,
     EDC_REST_ENDPOINT: '${EDC_REST_ENDPOINT}',
     JDG_REST_ENDPOINT: '${JDG_REST_ENDPOINT}',
-    GOOGLE_MAPS_API_KEY: '${GOOGLE_MAPS_API_KEY}'
+    GOOGLE_MAPS_API_KEY: '${GOOGLE_MAPS_API_KEY}',
+    DEMO_ASSET: '${DEMO_ASSET}'
 });
 
 Rickshaw.namespace('Rickshaw.Graph.Renderer.Xkcd');
