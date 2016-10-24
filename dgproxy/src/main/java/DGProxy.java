@@ -39,7 +39,7 @@ public class DGProxy {
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.addServer()
               .host("localhost")
-              .port(11222);
+              .port(11422);
         cacheManager = new RemoteCacheManager(builder.build());
         cache = cacheManager.getCache("default");
     }
