@@ -152,6 +152,7 @@ angular.module('app')
             });
 
             // get asset list
+/*
             $http({
                 method: 'GET',
                 url: APP_CONFIG.EDC_REST_ENDPOINT + '/assets',
@@ -161,10 +162,11 @@ angular.module('app')
             }).then(function successCallback(response) {
 
                 response.data.assetInfo.forEach(function(asset) {
+*/
 
                     $http({
                         method: 'GET',
-                        url: APP_CONFIG.EDC_REST_ENDPOINT + '/assets/' + asset.asset + '/topics',
+                        url: APP_CONFIG.EDC_REST_ENDPOINT + '/assets/' + APP_CONFIG.DEMO_ASSET + '/topics',
                         headers: {
                             'Authorization': auth
                         }
@@ -184,6 +186,7 @@ angular.module('app')
                     });
 
 
+/*
 
                 });
 
@@ -191,6 +194,7 @@ angular.module('app')
                 Notifications.error("error fetching asset list: " + response.statusText);
 
             });
+*/
 
             // {
             // 	pkgId: '0520 - ColdFire Parts',
@@ -199,6 +203,7 @@ angular.module('app')
             // 	eta: Date.now() + (Math.random() * (1000 * 60 * 60 * 24 * 3))
             // }
 
+/*
             $http({
                 method: 'GET',
                 url: APP_CONFIG.EDC_REST_ENDPOINT + '/assets',
@@ -237,6 +242,7 @@ angular.module('app')
             }, function errorCallback(response) {
                 Notifications.error("error fetching asset list: " + response.statusText);
             });
+*/
 
         };
 
