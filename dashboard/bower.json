@@ -7,8 +7,8 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
-    "patternfly": "3.4.0",
-    "angular-patternfly": "3.4.0",
+    "patternfly": "3.14.0",
+    "angular-patternfly": "3.14.0",
     "angular-route": "1.5.3",
     "angular-websocket": "2.0.0",
     "rickshaw": "1.5.1",
@@ -21,7 +21,10 @@
   },
   "resolutions": {
     "angular": "~1.5.6",
-    "moment": "~2.11.0",
+    "moment": ">=2.10.5",
     "d3": "~3.5.5"
+  },
+  "dependencies": {
+    "rcue": "../../rcue#^3.14.0"
   }
 }
