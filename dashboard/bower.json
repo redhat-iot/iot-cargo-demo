@@ -9,22 +9,23 @@
   "devDependencies": {
     "patternfly": "3.14.0",
     "angular-patternfly": "3.14.0",
-    "angular-route": "1.5.3",
     "angular-websocket": "2.0.0",
     "rickshaw": "1.5.1",
     "angular-rickshaw": "0.11.0",
     "ngmap": "1.17.3",
-    "angular-moment": "0.10.3",
     "angular-bootstrap-switch": "0.5.1",
     "async": "1.5.2",
     "atmosphere": "2.3.2"
   },
   "resolutions": {
-    "angular": "~1.5.6",
     "moment": ">=2.10.5",
-    "d3": "~3.5.5"
+    "d3": "~3.5.5",
+    "angular-moment": "1.0.0",
+    "angular-route": "1.5.8"
   },
   "dependencies": {
-    "rcue": "../../rcue#^3.14.0"
+    "angular-moment": "1.0.0",
+    "angular-route": "1.5.8",
+    "angular-sanitize": "^1.5.8"
   }
 }
