@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('app').directive('tempChart', function (Alerts) {
+angular.module('app').directive('tempChart', ['Alerts', function (Alerts) {
 
 
     return {
@@ -135,4 +135,4 @@ angular.module('app').directive('tempChart', function (Alerts) {
 
         }
     };
-});
+}]);

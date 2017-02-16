@@ -2,16 +2,17 @@
 
 angular.module('app')
 
-    .factory('ConfigData', ['$http', '$q', 'APP_CONFIG', 'Notifications', function ($http, $q, APP_CONFIG, Notifications) {
+    .factory('ConfigData', ['$http', '$q', '$location', 'APP_CONFIG', 'Notifications', function ($http, $q, $location, APP_CONFIG, Notifications) {
         var listeners = [], factory = {}, currentShipments = [], allShipmentPkgIds = [], offlineMode = false,
-            auth = make_base_auth(APP_CONFIG.EDC_USERNAME, APP_CONFIG.EDC_PASSWORD);
+            auth = make_base_auth(APP_CONFIG.BROKER_USERNAME, APP_CONFIG.BROKER_PASSWORD),
+            configRestEndpoint = "http://" + APP_CONFIG.DATASTORE_REST_HOSTNAME + '.' + $location.host().replace(/^.*?\.(.*)/g,"$1") + '/rest';
 
         function make_base_auth(user, password) {
             var tok = user + ':' + password;
             var hash = btoa(tok);
             return "Basic " + hash;
         }
-        
+
         factory.addListener = function (listener) {
             listeners.push(listener);
         };
@@ -93,7 +94,7 @@ angular.module('app')
 
             $http({
                 method: 'PUT',
-                url: APP_CONFIG.JDG_REST_ENDPOINT + '/rhiot/sensorConfig',
+                url: configRestEndpoint + '/rhiot/sensorConfig',
                 data: JSON.stringify(shipments)
             }).then(function successCallback(response) {
                 onSuccess(shipments);
@@ -108,7 +109,7 @@ angular.module('app')
 
             allShipmentPkgIds = [];
             currentShipments = [];
-            
+
             function offlineMode() {
                 offlineMode = true;
                 currentShipments = [
@@ -126,7 +127,7 @@ angular.module('app')
             // get config
             $http({
                 method: 'GET',
-                url: APP_CONFIG.JDG_REST_ENDPOINT + '/rhiot/sensorConfig'
+                url: configRestEndpoint + '/rhiot/sensorConfig'
             }).then(function (response) {
                 currentShipments = response.data;
                 if ((currentShipments == undefined) || (currentShipments.constructor !== Array)) {

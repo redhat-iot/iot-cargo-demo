@@ -1,17 +1,23 @@
 'use strict';
 
-var module = angular.module('app', ['ngRoute', 'ui.bootstrap', 'patternfly', 'angular-websocket', 'ngMap', 'angular-rickshaw', 'angularMoment', 'frapontillo.bootstrap-switch']);
+var module = angular.module('app', ['ngRoute', 'ui.bootstrap', 'patternfly',
+                                    'angular-websocket', 'ngMap',
+                                    'angular-rickshaw', 'angularMoment',
+                                    'frapontillo.bootstrap-switch']);
 
-angular.module('app')
+angular.element(document).ready(function () {
 
-// TODO: Use JBoss SSO to properly protect app
-.constant('APP_CONFIG', {
-    EDC_USERNAME: '${EDC_USERNAME}',
-    EDC_PASSWORD: '${EDC_PASSWORD}' ,
-    EDC_REST_ENDPOINT: '${EDC_REST_ENDPOINT}',
-    JDG_REST_ENDPOINT: '${JDG_REST_ENDPOINT}',
-    GOOGLE_MAPS_API_KEY: '${GOOGLE_MAPS_API_KEY}',
-    DEMO_ASSET: '${DEMO_ASSET}'
+    // get config
+    var initInjector = angular.injector(["ng"]);
+    var $http = initInjector.get("$http");
+
+    $http.get("config.json").then(function (response) {
+        module.constant("APP_CONFIG", response.data);
+        console.log("Bootstrapping system");
+        angular.bootstrap(document, ["app"], {
+            strictDi: true
+        });
+    });
 });
 
 Rickshaw.namespace('Rickshaw.Graph.Renderer.Xkcd');
@@ -81,5 +87,3 @@ Rickshaw.Graph.Renderer.Xkcd = Rickshaw.Class.create(Rickshaw.Graph.Renderer, {
         }, this);
     }
 });
-
-

@@ -121,7 +121,7 @@
 
         <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
 
-	<version.org.infinispan>8.2.4.Final</version.org.infinispan>
+        <version.org.infinispan>6.4.1.Final-redhat-1</version.org.infinispan>
 
         <version.jboss.spec.javaee.7.0>1.0.3.Final</version.jboss.spec.javaee.7.0>
 
@@ -152,13 +152,15 @@
                 <scope>import</scope>
             </dependency>
 
-                    <dependency>
+            <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-bom</artifactId>
                 <version>${version.org.infinispan}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+
 
 </dependencies>
     </dependencyManagement>
@@ -169,6 +171,27 @@
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-remote</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-client-hotrod</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-query-dsl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-remote-query-client</artifactId>
+        </dependency>
+
+            <dependency>
+                <groupId>javax.cache</groupId>
+                <artifactId>cache-api</artifactId>
+                <version>1.0.0.redhat-1</version>
+            </dependency>
 
         <!-- Import the CDI API, we use provided scope as the API is included in JBoss EAP -->
         <dependency>
@@ -204,7 +227,7 @@
                 <configuration>
                <!-- Java EE doesn't require web.xml, Maven needs to catch up! -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-			<warName>dgproxy</warName>
+			<warName>ROOT</warName>
                 </configuration>
             </plugin>
             <!-- WildFly plug-in to deploy the WAR -->
@@ -216,27 +239,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <!-- When built in OpenShift the 'openshift' profile will be used when invoking mvn. -->
-            <!-- Use this profile for any OpenShift specific customization your app will need. -->
-            <!-- By default that is to put the resulting archive into the 'deployments' folder. -->
-            <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
-            <id>openshift</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>${version.war.plugin}</version>
-                        <configuration>
-                            <outputDirectory>deployments</outputDirectory>
-                            <warName>ROOT</warName>
-                            <!-- Java EE doesn't require web.xml, Maven needs to catch up! -->
-                            <failOnMissingWebXml>false</failOnMissingWebXml>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

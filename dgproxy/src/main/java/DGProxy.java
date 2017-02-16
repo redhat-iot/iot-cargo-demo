@@ -20,6 +20,7 @@ import javax.ws.rs.*;
 import org.infinispan.client.hotrod.configuration.*;
 import org.infinispan.client.hotrod.*;
 import javax.inject.Singleton;
+import java.util.Properties;
 
 /**
  * A simple REST service which proxies requests to a local datagrid.
@@ -36,12 +37,36 @@ public class DGProxy {
     private RemoteCache<String, String> cache;
 
     public DGProxy() {
+
+        String host = System.getenv("DATASTORE_HOST");
+        if (host == null) {
+            host = "localhost";
+        }
+
+        int port = 11333;
+        String portStr = System.getenv("DATASTORE_PORT");
+        if (portStr != null) {
+            port = Integer.parseInt(portStr);
+        }
+
+        String cacheName = System.getenv("DATASTORE_CACHE");
+        if (cacheName == null) {
+            cacheName = "cargo";
+        }
+
+        System.out.println("DG Proxy initializing to " + host + ":" + port + " cache:" + cacheName);
+
+        Properties props = new Properties();
+        props.setProperty("infinispan.client.hotrod.protocol_version", "1.0");
+
         ConfigurationBuilder builder = new ConfigurationBuilder();
-        builder.addServer()
-              .host("localhost")
-              .port(11422);
+        builder.withProperties(props).addServer()
+              .host(host)
+              .port(port);
         cacheManager = new RemoteCacheManager(builder.build());
-        cache = cacheManager.getCache("default");
+        cache = cacheManager.getCache(cacheName);
+
+        System.out.println("DG Proxy connected to " + host + ":" + port + " cache:" + cacheName);
     }
 
 
