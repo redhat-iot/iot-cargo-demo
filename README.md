@@ -8,13 +8,6 @@ including temperature, humidity, displacement, light levels, etc.
 
 ![Dashboard Screenshot](/../screenshots/screenshots/iot-dashboard.png?raw=true "Dashboard Screenshot")
 
-Requirements to build/run:
-
-1. [Nodejs](http://nodejs.org/)
-1. [NPM](https://www.npmjs.com/)
-1. [Bower](https://bower.io/)
-1. [Maven](https://maven.apache.org/)
-
 Technologies used:
 
 - [EuroTech Everyware Device Cloud](http://www.eurotech.com/en/products/software+services/everyware+device+cloud)
@@ -22,42 +15,40 @@ Technologies used:
 - [Patternfly](http://patternfly.org)
 - [JBoss Middleware](https://www.redhat.com/en/technologies/jboss-middleware) (EAP, JDG, and more to come)
 
-Building and running the Dashboard
------------------------------------------
-The dashboard is a Java EE web app built using Maven that can be deployed to JBoss EAP 6.x, 7.x, or later.
-Building the project results in a .war file. Once deployed to JBoss EAP (e.g. by copying to the 
-`standalone/deployments` directory), access the dashboard at `http://localhost:8180`. It will attempt to 
-connect to the EuroTech Device Cloud and start streaming data from selected devices and sensors.
+Running on OpenShift
+--------------------
 
-It also relies on a [JBoss Data Grid server](https://www.redhat.com/en/technologies/jboss-middleware/data-grid)
-to be available using its built-in REST interface.
+The demo deploys as an Angular.js app running on a Node.js runtime, along with JBoss Data Grid and a Data Grid
+proxy component that properly handles browser-based REST requests and relays to JBoss Data Grid via the Hotrod
+protocol.
 
 Follow these steps to build and run the demo:
 
-* [Download](https://access.redhat.com/products/red-hat-jboss-data-grid) and run JBoss Data Grid 7.0.0 or later:
+1. Install and have access to an [OpenShift Container Platform](https://www.openshift.com/container-platform/) 3.2 or later or [OpenShift Origin](https://www.openshift.org/) 1.2 or later. You must be able to use the `oc` command line tool.
+
+2. Clone this repo
 ```
-    $ unzip jboss-datagrid-7.0.0-server.zip
-    $ jboss-datagrid-7.0.0-server/bin/standalone.sh
-```
-* [Download](https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform/) and run JBoss EAP 7.0 or later and specify a port offset to avoid port conflicts with Data Grid:
-```
-    $ unzip jboss-eap-7.0.0.zip
-    $ jboss-eap-7.0.0/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -b 0.0.0.0 -bmanagement=0.0.0.0
-```  
-* Clone this repo to `<WORKSPACE>` directory, and build the Data Grid proxy, and deploy to EAP using these commands:
-```
-    $ cd <WORKSPACE>/dgproxy
-    $ mvn clean package
-    $ cp target/dgproxy.war <JBOSS_EAP_HOME>/standlone/deployments
-```
-* Supply your Eurotech and Google API credentials, then build and run the dashboard using these commands:
-```
-    $ cd <WORKSPACE>/dashboard
-    $ cp app.properties.template app.properties
-    $ vi app.properties # make necessary changes to provide credentials and URLs
-    $ bower install
-    $ mvn package
-    $ cp target/ROOT.war <JBOSS_EAP_HOME>/standalone/deployments
+git clone https://github.com/redhat-iot/iot/cargo/demo
 ```
 
-If it successfully deploys, you should be able to access the dashboard at `http://localhost:8180`.
+3. Issue the following commands to create a new OpenShift project and deploy the demo components:
+```
+oc new-project myproject
+oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
+oc process -f openshift-template.yaml | oc create -f -
+```
+
+You can monitor the build with `oc status` or watch the deployments using the OpenShift web console.
+
+Once everything is up and running, you can access the demo using the URL of the `dashboard` route,
+for example `http://dashboard-myproject.domain`
+
+Options
+-------
+
+If you have a maven mirror (e.g. Nexus), you can specify it with the `MAVEN_MIRROR_URL` environment variable when deploying the demo:
+```
+oc process -f openshift-template.yaml MAVEN_MIRROR_URL=http://nexus.ci:8081/repository/maven-public-all| oc create -f -
+```
+
+If you have a Google Maps API Key, specify it similarly with `GOOGLE_MAPS_API_KEY` environment variable.
